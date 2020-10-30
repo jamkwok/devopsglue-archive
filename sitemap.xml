@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+<url>
+  <loc>https://devopsglue.com/</loc>
+  <lastmod>2016-03-11T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://devopsglue.com/index.html</loc>
+  <lastmod>2016-03-11T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://devopsglue.com/blogs/20160311.html</loc>
+  <lastmod>2016-03-11T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://devopsglue.com/blogs/20160306.html</loc>
+  <lastmod>2016-03-11T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://devopsglue.com/blogs/20160313.html</loc>
+  <lastmod>2016-03-13T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://devopsglue.com/blogs/20160329.html</loc>
+  <lastmod>2016-03-29T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://devopsglue.com/blogs/20160402.html</loc>
+  <lastmod>2016-03-29T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://devopsglue.com/blogs/20160418.html</loc>
+  <lastmod>2016-04-19T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://devopsglue.com/blogs/20160423.html</loc>
+  <lastmod>2016-04-23T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://devopsglue.com/blogs/20160515.html</loc>
+  <lastmod>2016-05-01T10:11:56+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+
+</urlset>

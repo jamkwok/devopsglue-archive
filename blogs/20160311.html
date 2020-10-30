@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>DevOps Glue AWS - LINUX  - NodeJS - AJAX - MySQL - Web</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <!-- Js Functions -->
+    <script src="../js/ajax.js"></script> 
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="https://au.linkedin.com/in/jamkwok">James Kwok</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="../index.html">Home</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('../img/20160313.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div id="blogtitle" class="post-heading">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <script> getBlogTitle("20160311");</script>
+
+    <!-- Post Content -->
+    <article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <p>Amazon AMIs are required for services such as aws autoscaling. When autoscaling needs to bring a new instance up it needs a machine image with the application preloaded into it. Traditionally making AMIs has been a painful process. That is until Hashicorp's packer entered the scene.</p>
+
+                    <p> Packer does AMI building multiple ways, the first is via amazon-ebs backed volume. When packer reads the template json, it will create an ec2 instance specified in the template and execute the embedded scripts. In our example we install redis for caching. Packer handles creating the instance, relevant keys and security groups before terminating the instance after the AMI is created with redis preload. Once the relevant AMI is created packer can create the relevant artifact for our pipeline such as the new AMI ID. The entire process takes a few good minutes since an EC2 instance is raised each time, however Packer also has a faster way.</p>
+
+		    <p>Sample template to bake redis into AMI (packer_template.json):</p>
+		    <div class="bootstrap-demo">
+  			<pre><p>{
+        "builders": [
+                {
+                        "type": "amazon-ebs",
+                        "access_key": "%Insert AWS Key here%",
+                        "secret_key": "%Insert AWS Secret here%",
+                        "region": "ap-southeast-2",
+                        "source_ami": "ami-11032472",
+                        "instance_type": "t2.micro",
+                        "ssh_username": "ec2-user",
+                        "ami_name": "packer-quick-start {{timestamp}}",
+                        "tags": {
+                                "OS_Version": "AWS linux",
+                                "Release": "Custom"
+                        }
+                }
+        ],
+        "provisioners": [
+                {
+                        "type": "shell",
+                        "inline": [
+                                "sleep 30",  
+         		        “sudo yum-config-manager --enable epel”,
+		         	“sudo yum clean all”,
+                                "sudo yum -y install redis",
+				"sudo chkconfig redis on"
+                        ]
+                }
+        ]
+}			</p></pre>
+ 		    </div>
+		    <p>Running ebs-backed template:</p>
+                    <div class="bootstrap-demo">
+                        <pre><p>
+			packer build packer_template.json 
+			</p></pre>
+		    </div>
+		    <p>Packer has a chroot method as well. So instead of raising a new EC2 everytime. We as the admin create an Ec2 instance with packer installed. This Ec2 instance will be persistent so is fairly expensive since it is always on. When packer is called on the system it will read a similar json file and mount an EBS volume with the contents of the source AMI. Packer then chroots to this EBS and performs the required functions. Once everything is wrapped up, an AMI is created and packer unmounts the EBS. The caveat is that all processes must have ended so you cant start the redis service up and expect packer to still be able to unmount the EBS volume. That said you need only have to create an init script or use chkconfig for such services to start when the new created AMI is loaded in autoscale.</p>
+
+                    <p> Hashicorp Packer <a href="https://www.packer.io/docs/builders/amazon-ebs.html">ebs-backed</a> and <a href="https://www.packer.io/docs/builders/amazon-chroot.html">chroot</a>.</p>
+
+		    <hr>
+
+		    <div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//packerdevopsgluecom.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+	
+		    
+                </div>
+            </div>
+        </div>
+    </article>
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/jameszkwok">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.facebook.com/james.kwok.334">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://au.linkedin.com/in/jamkwok">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                     <p class="copyright text-muted">Copyright &copy; DevOpsGlue.com 2016</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
+

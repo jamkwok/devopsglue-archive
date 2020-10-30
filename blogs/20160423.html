@@ -1,0 +1,371 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>DevOps Glue AWS - LINUX  - NodeJS - AJAX - MySQL - Web</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <!-- Js Functions -->
+    <script src="../js/ajax.js"></script> 
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="https://au.linkedin.com/in/jamkwok">James Kwok</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="../index.html">Home</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('../img/20160313.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div id="blogtitle" class="post-heading">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <script> getBlogTitle("20160423");</script>
+
+
+    <!-- Post Content -->
+    <article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+		
+		<p>Ajax is allows for dynamic conntent to be loaded in html, however the jQuery framework provides a much neaterway of using ajax as compared to the previous tutorial. This project aims to use nodejs to connect to a MySQL database and retrieve photo db records that have been categorized into areas like beach and cycling. The index.html page will trigger the photos to be loaded for the different categories through a jQuery ajax call through a dropdown menu.</p> 
+		 
+                <p>Github Project files <a href="https://github.com/jamkwok/jquery_ajax_tutorial">index.html | package.json |  node_server.js</a></p>
+
+
+		<h2 class="section-heading">Background with AWS Cloudfront</h2>
+		<p>You will notice the source files will constantly refer to https://album.devopsglue.com , however NodeJS will listen on port 8000. Since my Internet Service Provider blocks port 80, I had to use AWS cloudfront to connect to my home server on port 8000 to overcome the ISP port block. AWS Cloudfront is a site accelerator by caching static content, however if configured to allow method POST and so on it, will allow for the pass through of dynamic content back to my server (the origin server) to interact with NodeJS on port 8000. </p>
+
+		<div class="jumbotron">
+                <p> Cloudfront Cache Behaviour </p>
+                    <a href="../img/20160423_ajax_cloudfront.jpg">
+                        <img class="img-responsive img-rounded" src="../img/20160423_ajax_cloudfront.jpg" alt="">
+                    </a>
+                </div>
+
+		<div class="jumbotron">
+                <p> Cloudfront Origin Settings </p>
+                    <a href="../img/20160423_ajax_cloudfront2.jpg">
+                        <img class="img-responsive img-rounded" src="../img/20160423_ajax_cloudfront2.jpg" alt="">
+                    </a>
+                </div>
+
+		<h2 class="section-heading">The Code</h2>
+
+		<p>NPM is an amazing dependecy package manager for NodeJS, hwoever after many projects it can surely get annoying typing npm install &ltpackage&gt for many projects. Once you have installed the npm modules of your choice , you can run npm init which will create a package.json file that can be committed to any code repository. Once the package.json file exists you can run npm install to automatically install everything you need. You can copy this package.json file to get started. </p>
+ 	 
+		 <p>package.json template:</p>
+		    <div class="bootstrap-demo">
+  			<pre><p>
+{
+  "name": "node-mysql",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "^4.10.6",
+    "mysql": "^2.5.4",
+    "body-parser": "~1.15.0"
+  },
+  "description": "ERROR: No README data found!",
+  "main": "node_server.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD"
+}
+
+			</p></pre>
+		    </div>
+
+		<p>The jQuery framework for ajax is much more simpler than using xmlhttp requests. The framework infact uses xmlhttp, but this is all done under the hood to provide developers with a seamless experience. The function below takes in a category triggered by a menu dropdown and then uses the method POST to pass this variable to the node_server.js. Basically this is much better than xmlhttp because you only need the condition of success and not have to worry about the state and the http header as in xmlhttp. The jQuery framework abstracts everything to allow the developer to focus on delivering code that works. The code below will replace the div 'photos' with the response from the nodejs server. The POST key is 'keyword' and is what NodeJS express will be looking for, the category will saved as a variable as passed through the javascript function.</p>
+	        <p>index.html jQuery AJAX extract:</p>
+                    <div class="bootstrap-demo">
+                        <pre><p>
+
+  function getPhotos (category) {
+        var formData = { keyword : category };
+
+        $.ajax({
+            url : "https://album.devopsglue.com/query",
+            type: "POST",
+            data : formData,
+            success: function(data, textStatus, jqXHR)
+            {
+                //data - response from server
+                $('#photos').html(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+                $('#photos').html("Damn it's broken!");
+            }
+        });
+  }
+
+                        </p></pre>
+                    </div>
+		<p>As with the previous tutorial, NodeJS here uses the express framework for routing, the route in the below example is 'query' to invoke the mysql connection to find all records associated to the passed category from ajax and 'menu' which invokes mysql. Which returns the unique collection of categories for our menu dropbox. We use the body-parser to retrieve the POST variables invoked by ajax since it is no longer included as standard in express 4.0. The mysql node module sanitizes passed in variables by preventing escapes for possible SQL injection. The Node code is pretty straight forward as with the previous node tutorial, the '+=' appends strings and since we are appending html it gives for better readability. Once the html variable is compiled with our html it is sent back to ajax.</p>
+                <p>node_server.js template:</p>
+                    <div class="bootstrap-demo">
+                        <pre><p>
+ var express = require("express");
+ var app = express();
+ var mysql      = require('mysql');
+ var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'user',
+  password : 'password',
+  database : 'album'
+ });
+
+  var bodyParser = require('body-parser');
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+
+ /* serves main page */
+ app.get("/", function(req, res) {
+    res.sendfile('index.html')
+ });
+
+ app.post("/menu", function(req, res) {
+    var keyword = "";
+    var html    = "";
+
+    connection.query("SELECT DISTINCT keyword from album", function(err, rows, fields) {
+        if (!err) {
+                html += "&ltdiv class=\"dropup\"&gt";
+                html += "&ltbutton class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdownMenu1\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"&gt";
+                html += "Album Category";
+                html += "&ltspan class=\"caret\"&gt&lt/span&gt";
+                html += "&lt/button&gt";
+                html += "&ltul class=\"dropdown-menu dropdown-menu-right\" aria-labelledby=\"dLabel\"&gt";
+                for (var i = 0; i &lt rows.length; i++) {
+                        keyword     = rows[i].keyword;
+                        html       += "&ltli&gt&lta href=\"javascript:getPhotos('" + keyword +"');\"&gt" + keyword + "&lt/a&gt&lt/li&gt";
+                };
+                html += "&lt/ul&gt";
+                html += "&lt/div&gt";
+                console.log(html);
+                res.send(200,html);
+
+       } else {
+                console.log('Error while performing Query.');
+       }
+       connection.end();
+    });
+ });
+
+
+ app.post("/query", function(req, res) {
+    /* some server side logic */
+    var value       = req.body.keyword;
+    var photo       = "NULL";
+    var description = "NULL";
+    var html        = "";
+
+    connection.query("SELECT photo,description,keyword from album WHERE keyword='"+ value + "'", function(err, rows, fields) {
+        if (!err) {
+                for (var i = 0; i &lt rows.length; i++) {
+                        photo       = rows[i].photo;
+                        description = rows[i].description;
+                        category    = rows[i].keyword;
+
+                        html       += "&ltdiv class=\"card\"&gt";
+                        html       += "&ltimg src=\"https://www.devopsglue.com/photoshoot/" + photo + ".jpg\" style=\"width: 75%; height: 75%\" alt=\"Card image cap\"&gt";
+                        html       += "&ltp class=\"card-text\"&gtDescription:" + description + ".&lt/p&gt";
+                        html       += "&ltp class=\"card-text\"&gtPhoto:" + photo + ".&lt/p&gt";
+                        html       += "&ltp class=\"card-text\"&gtCategory:" + category + ".&lt/p&gt";
+                        html       += "&lt/div&gt";
+                };
+                console.log(html);
+                res.send(200,html);
+       } else {
+                console.log('Error while performing Query.');
+       }
+       connection.end(); 	
+    });
+
+ });
+
+ /* serves all the static files */
+ app.get(/^(.+)$/, function(req, res){
+     console.log('static file request : ' + req.params);
+     res.sendfile( __dirname + req.params[0]);
+ });
+
+var port = process.env.PORT || 8000;
+ app.listen(port, function() {
+   console.log("Listening on " + port);
+ });
+
+                        </p></pre>
+                    </div>
+
+		<p>The below shows the basic mysql schema, with one table called 'album' in a db called 'album'. These fields store a filename in field photo which is what the camera has called the jpg, a category which I have categorized the photo as belonging to and a description briefly given about the photo. </p>
+
+		<div class="jumbotron">
+                <p> MySQL Schema </p>
+                    <a href="../img/20160423_ajax_mysql.jpg">
+                        <img class="img-responsive img-rounded" src="../img/20160423_ajax_mysql.jpg" alt="">
+                    </a>
+                </div>
+
+		<h2 class="section-heading">Seamless ajax html transitions </h2>
+
+		<p>The below is the finished product, the menu dropbox called 'Album Category' toggles the photos based on what category is selected. </p>
+
+
+		<div class="jumbotron">
+                <p> Ajax - category : beach</p>
+                    <a href="../img/20160423_ajax_beach.jpg">
+                        <img class="img-responsive img-rounded" src="../img/20160423_ajax_beach.jpg" alt="">
+                    </a>
+                </div>
+		
+		<p>After clicking the menu option 'cycling' ajax switches the pictures by passing a call through to NodeJS to find the 'cycling' pictures in MySQL. This loads only the pictures portion of the page and not the entire page.</p>
+	
+		<div class="jumbotron">
+                <p>Ajax - category : cycling </p>
+                    <a href="../img/20160423_ajax_cycling.jpg">
+                        <img class="img-responsive img-rounded" src="../img/20160423_ajax_cycling.jpg" alt="">
+                    </a>
+                </div>
+
+
+
+	        <hr>
+	        <div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//nodejsdevopsgluecom.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+		</div>
+            </div>
+        </div>
+    </article>
+    <hr>
+
+    <!-- Footer -->
+     <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/jameszkwok">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.facebook.com/james.kwok.334">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://au.linkedin.com/in/jamkwok">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                     <p class="copyright text-muted">Copyright &copy; DevOpsGlue.com 2016</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+	
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
+

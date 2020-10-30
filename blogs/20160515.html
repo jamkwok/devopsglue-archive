@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>DevOps Glue AWS - LINUX  - NodeJS - AJAX - MySQL - Web</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../css/clean-blog.min.css" rel="stylesheet">
+    <link href="../css/img.css" rel="stylesheet">	
+    <!-- Custom Fonts -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <!-- Js Functions -->
+    <script src="../js/ajax.js"></script> 
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="https://au.linkedin.com/in/jamkwok">James Kwok</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="../index.html">Home</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('../img/20160313.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div id="blogtitle" class="post-heading">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <script> getBlogTitle("20160515");</script>
+	
+    <!-- Post Content -->
+    <article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+		
+		<p>Microservices is a whole new way to think about writing code. Previously many developers would entangle html print statements in their backend, you'll see this prevalent in some backend languages such as php (including some of these tutorials on this site). Imagine if the backend were written as a REST API and all your components/products interacted with one another via an API. For one, this would severely reduce the need for a complex and often expensive ESB and you would be able to upgrade the components independently of one another. The frontend would use ajax to call the backend APIs and manipulate the json into a html format. This means the backend no longer returns any html and there is a major advantage to this. For example the backends themselves could be written in different languages or if in java, run on different JDK versions in contrast to a monolithic build. Monolithic builds still have their place as they are much simplier to maintain as they could call one anothers datastore directly (eg one service directly accessing another's database). However with microservcies the rule of thumb is one service can never access another's datastore directly and can only extract data through the given service's APIs.</p> 
+
+		<p>This tutorial aims to create a microservice that calls Dynamo DB to extract a list of current blogs for this site and display them using the frontend to render the json into html. We will explore the use of multiple origins to get around Cross domain problems on Cloudfront, API gateway so we have an endpoint for our service, Lambda function do have some logic and of course Dynamo DB which will be our designated datastore.</p>
+		<div  class="jumbotron">
+			<p> Martin Fowler has an amazing presentation on MicroServices: </p>
+			<iframe style="width: 100%;" align="center" src="https://www.youtube.com/embed/wgdBVIX9ifA?autoplay=0" frameborder="0" allowfullscreen></iframe>
+		</div>
+
+		<h2 class="section-heading">Step 1: Create and populate the dynamoDB table.</h2>
+		<p>The dynamoDB table is where we will store the blog dates, title, description and date as a string. DynamoDB is a NoSQL database so you cant use SQL to extract the data, however you can add attributes to records at anytime and it scales very well. You pay for what you actually use instead of an entire server like in AWS RDS.</p>
+
+	        <div class="jumbotron">
+                <p> Dynamo Table </p>
+                    <a href="../img/20160515_dyn.jpg">
+                        <img class="img-responsive img-rounded" src="../img/20160515_dyn.jpg" alt="">
+                    </a>
+                </div>
+
+		<h2 class="section-heading">Step 2: Create Lambda function to interface with DynamoDB table.</h2>
+		<p>To create the microservice, you will need a lambda function to pull the data from DynamoDB. This is simply written in Node using the Dynamo API and is very straight forward. You will need atleast 3 seconds of execution time just incase. Wile the function itself could be coded to sort the table contents, it is more efficient to use the client side to do this, a few milliseconds of sexecution time will add up in the grand scheme of things. Both the Dynamo table and lambda function must reside in the same region, since lambda is only available in a few regions, we have chosen the AWS Tokyo region to host both of these for us.<p>
+
+		<p>Lambda function to read DynamoDB table (readBlogTable):</p>
+                    <div class="bootstrap-demo">
+                        <pre><p>
+console.log('Loading event');
+var AWS = require('aws-sdk');
+var dynamodb = new AWS.DynamoDB();
+
+exports.handler = function(event, context,callback) {
+    var tableName = "devopsglue_blogs";
+    dynamodb.scan({
+        TableName : tableName,
+        Limit : 10
+    }, function(err, data) {
+        if (err) {
+            context.done('error','reading dynamodb failed: '+err);
+        }
+        callback(null, data);
+    });
+};                        
+			</p></pre>
+                    </div>
+		
+		<h2 class="section-heading">Step 3: Create API gateway Endpoint.</h2>
+		<p>Now that we have a lambda function we need to bind this function to an api endpoint. This endpoint will not match our hosted domain but thats okey for now, we will use cloudfront to mask this endpoint later on.</p>
+		<div class="jumbotron">
+                <p> API endpoint </p>
+                    <a href="../img/20160515_end.jpg">
+                        <img class="img-responsive img-rounded" src="../img/20160515_end.jpg" alt="">
+                    </a>
+                </div>
+
+		<h2 class="section-heading">Step 4: Establish a CloudFront frontend with multiple origins. </h2>
+                <p>AJAX has qwuirk where you cannot use it to call cross domains which is a security feature, however our AWS API endpoint is unfortunately another domain and thus our AJAX call will fail. Cloudfront can take multiple origins, we route traffic with a path pattern of '/prod/readBlogsTable' to our endpoint and everything else back to our s3 origin (where this site is hosted). Therefore the endpoint will now carry our hosted domain as its domain 'devopsglue.com'. In the code I've intentionally left this as a relativepath in the URL part of the AJAX call since this cloudfront distribution can accept many CNAMES such as blogs.devopsglue.com. Whatever the domain this is used to access this site, the ajax call will work regardless due to the multiple origin routing we have in place.  The caveat here is the routing must actually exist so you can't really say route all /api/* traffic to that endpoint and not have /api path exist in our api path '/prod/readBlogsTable'. Cloudfront unfortuantely cannot substitute paths while routing which would have been a nice feature.</p>
+		<div class="jumbotron">
+                <p> Multiple origin with routing </p>
+                    <a href="../img/20160515_clo.jpg">
+                        <img class="img-responsive img-rounded" src="../img/20160515_clo.jpg" alt="">
+                    </a>
+                </div>
+		
+		<h2 class="section-heading">Step 5: Code the frontend to transform json to html.</h2>
+                <p> The below code uses a for loop in javascript to render the json object returned by ajax. The html is printed and the code dives deep into the json to extract the attributes of the records. However we want to sort all the records by date which is an embedded attribute. How do we do this? We use the custom function predicatBy and toggle the -1 and 1 to sort by ascending or descending order.</p>
+
+	        <p>Frontend AJAX with Javascript to transform and sort json into html:</p>
+                    <div class="bootstrap-demo">
+                        <pre><p>
+	function getBlogList() {
+                $.ajax({
+                        url : "prod/readBlogsTable",
+                        type: "GET",
+                        success: function(data, textStatus, jqXHR)
+                        {
+                                 //var json = JSON.parse(data);
+                                 var html = " ";
+                                 var json = data;
+                                 var nblog = json["Count"];
+                                 json["Items"].sort(predicatBy("date"));
+                                 for (i = 0; i &lt nblog; i++) {
+                                        html += '&ltdiv class="post-preview"&gt';
+                                        html += '&lta href="blogs/' + json["Items"][i]["date"]["S"] + '.html"&gt';
+                                        html += '&lth2 class="post-title"&gt';
+                                        html += json["Items"][i]["blogs"]["S"];
+                                        html += '&lt/h2&gt';
+                                        html += '&lth3 class="post-subtitle"&gt';
+                                        html += json["Items"][i]["description"]["S"];
+                                        html += '&lt/h3&gt';
+                                        html += '&lt/a&gt';
+                                        html += '&ltp class="post-meta"&gtPosted by &lta href="blogs/' + json["Items"][i]["date"]["S"] + '.html"&gtJames Kwok &lt/a&gt' + json["Items"][i]["datealpha"]["S"] + '&lt/p&gt';
+                                        html += '&lt/div&gt';
+                                        html += '&lthr&gt';
+                                }
+                                $('#blogs').html(html);
+
+                        },
+                        error: function (jqXHR, textStatus, errorThrown)
+                        {
+                                $('#blogs').html("Damn it's broken!");
+                        }
+                });
+        }
+
+        function predicatBy(prop){
+                return function(a,b){
+                if( a[prop]["S"] &gt b[prop]["S"]){
+                        return -1;
+                }else if( a[prop]["S"] &lt b[prop]["S"]){
+                        return 1;
+                }
+                return 0;
+        }                        
+			</p></pre>
+                    </div>
+		<div class="jumbotron">
+		    <p> Dynamic Menu (finished product used for this site): </p>
+                    <a href="../img/20160515_men.jpg">
+                        <img class="img-responsive img-rounded" src="../img/20160515_men.jpg" alt="">
+                    </a>
+                </div>
+	
+		<h2 class="section-heading">Java Spring Boot</h2>
+                <p>While we have looked at NodeJS as a microservcie bankend, we can use JAVA with the spring boot framework to create the backend for those wishing to have a more traditional server backend setup. Spring boot comes with tomcat built right in, which drastically reduces the complexity of deployment. Like the Spring 4.0 framework that it is based on, it comes with many MVC goodies like URL routing to route different service requests to different service logic. Maven or Gradle will greatly assist in compilation, so be sure to use either one. Watch this space for a more detailed Spring boot write up.</p>		
+	        <hr>
+	        <div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//nodejsdevopsgluecom.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+		</div>
+            </div>
+        </div>
+    </article>
+    <hr>
+
+    <!-- Footer -->
+     <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/jameszkwok">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.facebook.com/james.kwok.334">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://au.linkedin.com/in/jamkwok">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                     <p class="copyright text-muted">Copyright &copy; DevOpsGlue.com 2016</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+	
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
+

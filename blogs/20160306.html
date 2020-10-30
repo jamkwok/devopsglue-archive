@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>DevOps Glue AWS - LINUX  - NodeJS - AJAX - MySQL - Web</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <!-- Js Functions -->
+    <script src="../js/ajax.js"></script>  
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="https://au.linkedin.com/in/jamkwok">James Kwok</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="../index.html">Home</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('../img/20160313.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div id="blogtitle" class="post-heading">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+   <script> getBlogTitle("20160306");</script>
+
+    <!-- Post Content -->
+    <article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <p>Drones have become ever increasingly present in the public space. There have been major concerns whether these small devices have compromised our safety forever as countries scramble to develop regulations around these them.  Drones however have the capacity for great good and it is this we will begin to explore their fire fighting capabilities.</p>
+
+                    <p>The idea is to have a drone guard the perimeter of a fire prone area which will land and automatically recharge and take flight once more. A drone offers a vantage point where satellite view is impeded by cloud cover and provides an inexpensive real time update of ground conditions to aid fire fighters in their constant battle.</p>
+
+                    <p>The drone will be equipped with a thermal imaging camera to help identify both the intensity and nature of a fire. With a thermal imaging camera it will be possible for the drone to determine the nature of the fire such as if it were an intense bush fire or someone illegally burning leaves in their backyard. The drone will have a guided flight path via GPS from recharge zone to recharge zone and with adaptive image processing, snap a picture of a potential fire and send it back to emergency HQ for further analysis.</p>
+
+                    <p>With sufficient development the drone will be ideally autonomous and with the equipped thermal imaging camera be able to correctly identify real fires.</p>
+
+		    <div  class="jumbotron">
+                        <p>Office Flightrun: </p>
+                        <iframe style="width: 100%;" align="center" src="https://www.youtube.com/embed/rqPCeLz5x34?autoplay=0" frameborder="0" allowfullscreen></iframe>
+                    </div>
+
+                    <h2 class="section-heading">Prototyping</h2>
+
+                    <p>To simulate the thermal imaging camera, we use a large red object and the Parrot AR Drone's  native front view camera. Both the image processing (OpenCV) and drone sdk have been written in node JS. As visible in the above youtube video, the proof of concept is to get the drone to hone in on our large red umbrella.We use openCV to identify a range of red and create contour lines around them, in the video there is clearly other sources of red. Via openCV we tell the drone to seek the largest contour area which it has identified as the umbrella and will ignore the other red objects.  This is to show the drone will have noise tolerance to heat sources that it will likely encounter along its flight path.</p>
+
+                    <p>Since openCV processes a stream of images, the team was tasked to create a socket that was constantly refreshed to show a video stream of images for use during the presentation. While the endeavour was definitely an amazing experience, it is in this author’s opinion that the AR drone is a horrible development platform simply due to its no frills sensors. </p>
+
+                    <p>The bottom facing camera could not be utilized since the resolution and colour reproduction was terrible. If it could have been used, this would have allowed the drone to fly over the umbrella and confirm the target which is what would be required in a real life scenario.  The onboard accelerometers have a lot of drift, so using the positional data was inaccurate.  In the future adding Arduino or Raspberry Pi based sensors would definitely make the platform more useable, or better still buy a more expensive drone.</p>
+
+                    <p> AR drone SDK <a href="https://github.com/felixge/node-ar-drone">node ar drone</a>. colour recognition <a href="https://github.com/peterbraden/node-opencv">opencv</a>.</p>
+
+		    <hr>
+		    <div id="disqus_thread"></div>
+			<script>
+			/**
+			* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+			* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+			*/
+			/*
+			var disqus_config = function () {
+			this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+			this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+			};
+			*/
+			(function() { // DON'T EDIT BELOW THIS LINE
+			var d = document, s = d.createElement('script');
+
+			s.src = '//devopsgluecom.disqus.com/embed.js';
+
+			s.setAttribute('data-timestamp', +new Date());
+			(d.head || d.body).appendChild(s);
+			})();
+			</script>
+			<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+			
+                </div>
+            </div>
+        </div>
+    </article>
+    <hr>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/jameszkwok">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.facebook.com/james.kwok.334">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://au.linkedin.com/in/jamkwok">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                     <p class="copyright text-muted">Copyright &copy; DevOpsGlue.com 2016</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
+
